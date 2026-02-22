@@ -1,0 +1,169 @@
+class GoogleHomeDashboard {
+  static async generate(config, hass) {
+    // Query all data we need. We will make it available to views by storing it in strategy options.
+    const [areas, devices, entities] = await Promise.all([
+      hass.callWS({ type: "config/area_registry/list" }),
+      hass.callWS({ type: "config/device_registry/list" }),
+      hass.callWS({ type: "config/entity_registry/list" }),
+    ]);
+    const navCards = [];
+    const areaCards = [];
+    const cameraCards = [];
+    const dashboard_path = window.location.pathname;
+    for (const area of areas) {
+      const areaDevices = new Set();
+      for (const device of devices){
+        if (device.area_id === area.area_id) {
+          areaDevices.add(device.id);
+        }
+      }
+      if (areaDevices.size > 0){ 
+        const area_url = dashboard_path + "?anchor=" + area.area_id
+        navCards.push({
+          type: "heading",
+          icon: "m3o:door-open",
+          heading: area.name,
+          heading_style: "title",
+          tap_action: {
+            action: "navigate",
+            navigation_path : area_url,
+            navigation_replace: true,
+          },
+        });
+        areaCards.push(
+          {
+            type: "custom:anchor-card",
+            anchor_id: area.area_id,
+            transition: 0,
+            negative_margin: 13,
+            timeout: 50,
+            offset: 0,
+            transition: 0,
+          },
+          {
+            type: "heading",
+            icon: "",
+            heading_style: "title",
+            heading: area.name
+          },
+        )
+      }
+      for (const entity of entities){
+        if (entity.area_id ? entity.area_id === area.area_id : areaDevices.has(entity.device_id)) {
+          const domain = entity.entity_id.split(".")[0];
+          switch(domain) {
+            case 'light':
+              if (!(entity.entity_id.includes("segment"))){
+                areaCards.push({
+                  type: "custom:material-slider-card",
+                  control_type: "light",
+                  entity: entity.entity_id,
+                  show_percentage: true,
+                });
+              }
+            break;
+            case 'climate':
+              areaCards.push({
+                type: "custom:material-climate-card",
+                entity: entity.entity_id,
+                increase_temp: 1,
+                decrease_temp: 1,
+                use_material_color: true,
+                use_default_icon: true,
+                fix_temperature: false,
+              });
+            break;
+            case 'camera':
+              cameraCards.push({
+                "type": "custom:webrtc-camera",
+                "entity": entity.entity_id,
+                "title": hass.states[entity.entity_id].attributes.friendly_name,
+                });
+                areaCards.push({
+                "type": "custom:webrtc-camera",
+                "entity": entity.entity_id,
+                "title": hass.states[entity.entity_id].attributes.friendly_name,
+                });
+            break;
+            case 'media_player':
+              areaCards.push({
+                "type": "custom:material-button-card",
+                "use_default_icon": true,
+                "use_default_toggle": true,
+                "use_default_text": true,
+                "entity": entity.entity_id,
+                "icon": "mdi:switch",
+                "height": 97,
+                "control_type": "media_player"
+              });
+            break;
+            default:
+            break;
+          }
+        }
+      }
+    }
+    return {
+      views: [
+        {
+          title: "Devices",
+          path: "devices",
+          icon: "m3r:devices-other",
+          type: "sections",
+          max_columns: 5,
+          header: {
+            card: {
+              type: "markdown",
+              content: `# Devices`,
+              text_only: true,
+            },
+            layout: "responsive",
+            badges_position: "bottom",
+            badges_wrap: "wrap",
+          },
+          theme: "Material You",
+          sections: [
+            {
+              type: "grid",
+              column_span: 1,
+              cards: navCards,
+            },
+            {
+              type: "grid",
+              column_span: 2,
+              cards: areaCards,
+            },
+          ]
+        },
+        {
+          title: "Cameras",
+          path: "camers",
+          icon: "m3r:devices-other",
+          type: "sections",
+          max_columns: 5,
+          header: {
+            card: {
+              type: "markdown",
+              content: `# Cameras`,
+              text_only: true,
+            },
+            layout: "responsive",
+            badges_position: "bottom",
+            badges_wrap: "wrap",
+          },
+          theme: "Material You",
+          sections: [
+            {
+              type: "grid",
+              column_span: 5,
+              cards: cameraCards,
+            }
+          ]
+        }
+      ]
+    };
+
+  }
+}
+
+customElements.define("ll-strategy-dashboard-google-home", GoogleHomeDashboard);
