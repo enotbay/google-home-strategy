@@ -58,10 +58,10 @@ function createLightCard (entity) {
   return (
     {
       "type": "custom:material-slider-card",
+      "entity": entity.entity_id,
       "show_percentage": true,
       "bold_text": false,
-      "control_type": "light",
-      "show_percentage": true,
+      "control_type": "light"
     }
   );
 }
