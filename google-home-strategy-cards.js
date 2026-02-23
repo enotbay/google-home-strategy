@@ -89,17 +89,17 @@ export function createClimateCard (entity) {
     }
   );
 }
-export function createCameraCard (entity) {
+export function createCameraCard (entity, entity_name) {
   return (
     {
       type: "custom:webrtc-camera",
       entity: entity.entity_id,
-      title: hass.states[entity.entity_id].attributes.friendly_name,
+      title: entity_name,
     }
   );
 }
 export function createMediaCard (entity) {
-  return (  
+  return (
     {
       type: "custom:material-button-card",
       use_default_icon: true,
