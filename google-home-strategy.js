@@ -1,4 +1,4 @@
-const { createRoomLightGroupCard, createLightCard } = await import('./google-home-strategy-cards.js');
+import * as cards from './google-home-strategy-cards.js';
 
 class GoogleHomeDashboard {
   static async generate(config, hass) {
@@ -32,14 +32,14 @@ class GoogleHomeDashboard {
             navigation_replace: true,
           },
         });
-        areaCards.push(
+        areaCards.push(          
           {
             type: "custom:anchor-card",
             anchor_id: area.area_id,
             transition: 0,
             negative_margin: 13,
             timeout: 50,
-            offset: 0,
+            offset: 0, 
             transition: 0,
           },
           {
@@ -56,45 +56,28 @@ class GoogleHomeDashboard {
           switch(domain) {
             case 'light':
               if (!(entity.entity_id.includes("segment"))){
-                areaCards.push({
-                  createLightCard(entity);
-                });
+                console.log(entity);
+                areaCards.push(cards.createLightCard(entity));
               }
             break;
+            case 'cover':
+              areaCards.push(cards.createCoverCard(entity));
+            break;
             case 'climate':
-              areaCards.push({
-                type: "custom:material-climate-card",
-                entity: entity.entity_id,
-                increase_temp: 1,
-                decrease_temp: 1,
-                use_material_color: true,
-                use_default_icon: true,
-                fix_temperature: false,
-              });
+              areaCards.push(cards.createClimateCard(entity));
             break;
             case 'camera':
-              cameraCards.push({
-                "type": "custom:webrtc-camera",
-                "entity": entity.entity_id,
-                "title": hass.states[entity.entity_id].attributes.friendly_name,
-                });
-                areaCards.push({
-                "type": "custom:webrtc-camera",
-                "entity": entity.entity_id,
-                "title": hass.states[entity.entity_id].attributes.friendly_name,
-                });
+              const camera_name = hass.states[entity.entity_id].attributes.friendly_name;
+              const camera_card = {
+                type: "custom:webrtc-camera",
+                entity: entity.entity_id,
+                title: camera_name,
+              }
+              cameraCards.push(camera_card);
+              areaCards.push(camera_card);
             break;
             case 'media_player':
-              areaCards.push({
-                "type": "custom:material-button-card",
-                "use_default_icon": true,
-                "use_default_toggle": true,
-                "use_default_text": true,
-                "entity": entity.entity_id,
-                "icon": "mdi:switch",
-                "height": 97,
-                "control_type": "media_player"
-              });
+              areaCards.push(cards.createMediaCard(entity));
             break;
             default:
             break;
