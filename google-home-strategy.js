@@ -1,3 +1,5 @@
+const { createRoomLightGroupCard, createLightCard } = await import('./google-home-strategy-cards.js');
+
 class GoogleHomeDashboard {
   static async generate(config, hass) {
     // Query all data we need. We will make it available to views by storing it in strategy options.
@@ -55,10 +57,7 @@ class GoogleHomeDashboard {
             case 'light':
               if (!(entity.entity_id.includes("segment"))){
                 areaCards.push({
-                  type: "custom:material-slider-card",
-                  control_type: "light",
-                  entity: entity.entity_id,
-                  show_percentage: true,
+                  createLightCard(entity);
                 });
               }
             break;
