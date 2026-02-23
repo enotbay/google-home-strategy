@@ -1,22 +1,13 @@
-const hacstag = new URL(import.meta.url).searchParams.get('hacstag');
-const { defaultConfig } = await import(
-  `./google-home-strategy-config.js?hacstag=${hacstag}`
-);
-const { createRoomLightGroupCard , createLightCard, createCoverCard, createCameraCard,createMediaCard } =
-  await import(`./google-home-strategy-cards.js?hacstag=${hacstag}`);
+import * as cards from './google-home-strategy-cards.js';
 
 class GoogleHomeDashboard {
-  static async generate(userConfig, hass) {
+  static async generate(config, hass) {
     // Query all data we need. We will make it available to views by storing it in strategy options.
     const [areas, devices, entities] = await Promise.all([
       hass.callWS({ type: "config/area_registry/list" }),
       hass.callWS({ type: "config/device_registry/list" }),
       hass.callWS({ type: "config/entity_registry/list" }),
     ]);
-    try {
-      const views = [];
-      const config = mergeDeep(defaultConfig, userConfig);
-    }
     const navCards = [];
     const areaCards = [];
     const cameraCards = [];
