@@ -29,25 +29,48 @@ export const defaultConfig = {
       }
     },
     cameras: {
-      title: "Cameras",
-      path: "camers",
-      icon: "m3r:devices-other",
-      type: "sections",
+      title: 'Cameras',
+      path: 'camers',
+      icon: 'm3r:devices-other',
+      type: 'sections',
       max_columns: 5,
       header: {
         card: {
-          type: "markdown",
+          type: 'markdown',
           content: `# Cameras`,
           text_only: true,
         },
-        layout: "responsive",
-        badges_position: "bottom",
-        badges_wrap: "wrap",
+        layout: 'responsive',
+        badges_position: 'bottom',
+        badges_wrap: 'wrap',
       },
-      theme: "Material You",
+      theme: 'Material You',
       sections: {
         camera_cards: {
-          type: "grid",
+          type: 'grid',
+          column_span: 5,
+        }
+      }
+    },
+    automations: {
+      title: 'Automations',
+      path: 'automations',
+      icon: 'm3o:auto-awesome',
+      type: 'sections',
+      max_columns: 5,
+      header: {
+        card: {
+          type: 'markdown',
+          content: `# Automations`,
+          text_only: true,
+        },
+        badges_position: 'bottom',
+        badges_wrap: 'wrap',
+      },
+      theme: 'Material You',
+      sections: {
+        camera_cards: {
+          type: 'grid',
           column_span: 5,
         }
       }
